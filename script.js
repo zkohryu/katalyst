@@ -151,3 +151,43 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initial mockup setup
   switchMockTab('fps');
 });
+
+// Copy Contact Info to Clipboard
+function copyContact(text, btnElement) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => {
+      showCopiedFeedback(btnElement);
+    }).catch(() => {
+      fallbackCopy(text, btnElement);
+    });
+  } else {
+    fallbackCopy(text, btnElement);
+  }
+}
+
+function showCopiedFeedback(btnElement) {
+  const textSpan = btnElement.querySelector('.btn-text');
+  if (!textSpan) return;
+  const original = textSpan.textContent;
+  textSpan.textContent = '✓ Kopyalandı!';
+  btnElement.classList.add('copied');
+  setTimeout(() => {
+    textSpan.textContent = original;
+    btnElement.classList.remove('copied');
+  }, 2200);
+}
+
+function fallbackCopy(text, btnElement) {
+  const textArea = document.createElement('textarea');
+  textArea.value = text;
+  document.body.appendChild(textArea);
+  textArea.select();
+  try {
+    document.execCommand('copy');
+    showCopiedFeedback(btnElement);
+  } catch (err) {
+    prompt('Kopyalamak için Ctrl+C tuşlarına basın:', text);
+  }
+  document.body.removeChild(textArea);
+}
+
